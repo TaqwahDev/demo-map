@@ -65,6 +65,7 @@ export default function SelectArea() {
                 longitude: coordinate.longitude,
             };
             locationCtx.setCurrentLocation(locationCurr);
+            console.log("Location: ", locationCurr);
         }
     );
 
@@ -100,7 +101,7 @@ export default function SelectArea() {
 
         locationCtx.setIsLoading(true);
         try {
-            await Location.startLocationUpdatesAsync("UPDATE_LOCATION", {
+            Location.startLocationUpdatesAsync("UPDATE_LOCATION", {
                 accuracy: Location.Accuracy.Balanced,
                 timeInterval: 2000,
                 distanceInterval: 5,
@@ -116,7 +117,9 @@ export default function SelectArea() {
     const stopLocationUpdates = async () => {
         locationCtx.setIsLoading(true);
         try {
-            Location.stopLocationUpdatesAsync("UPDATE_LOCATION");
+            if (locationCtx.currentLocation) {
+                Location.stopLocationUpdatesAsync("UPDATE_LOCATION");
+            }
             if (locationCtx.waypoints.length > 0) {
                 Location.stopGeofencingAsync("WATCH_POSITION");
             }
@@ -156,7 +159,7 @@ export default function SelectArea() {
     };
 
     React.useEffect(() => {
-        startLocationUpdates();
+        startLocationUpdates()
         getLocation();
         return () => {
             stopLocationUpdates();
@@ -176,6 +179,8 @@ export default function SelectArea() {
             const origin = locationCtx.origin;
             const destination = locationCtx.destination;
             if (!origin || !destination) {
+                locationCtx.setWaypoints(null);
+                locationCtx.setSteps(null);
                 return;
             }
             try {
@@ -183,6 +188,7 @@ export default function SelectArea() {
                     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&mode=driving&key=${env.GOOGLE_API_KEY}`
                 );
                 const data = await resopnse.json();
+                console.log("data", data);
                 const steps = data.routes[0].legs[0].steps;
                 // console.log("steps", steps);
                 const waypoints = steps.map((step) => {
@@ -236,7 +242,7 @@ export default function SelectArea() {
 
     React.useEffect(() => {
         if (currentWayPoints) {
-            // console.log("currentWayPoints", currentWayPoints);
+            console.log("currentWayPoints", currentWayPoints);
         }
     }, [currentWayPoints]);
 

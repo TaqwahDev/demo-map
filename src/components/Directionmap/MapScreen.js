@@ -37,7 +37,7 @@ export default function MapScreen() {
     if (locationCtx.errorMsg) {
         return (
             <View style={styles.container}>
-                <Text>{locationCtx.errorMsg}</Text>
+                <Text color={'#0000'}>{locationCtx.errorMsg}</Text>
             </View>
         );
     }
@@ -166,12 +166,12 @@ export default function MapScreen() {
                         mode="DRIVING"
                         region="bd"
                         onReady={(result) => {
-                            setPosition({
-                                distance: result.distance,
-                                duration: result.duration,
-                            });
-                            console.log(`Distance: ${result.distance} km`);
-                            console.log(`Duration: ${result.duration} min.`);
+                            const { distance, duration } = result;
+                            const res={distance,duration};
+                            setPosition(res);
+
+                            // console.log(`Distance: ${result.distance} km`);
+                            // console.log(`Duration: ${result.duration} min.`);
                             mapRef.current.fitToCoordinates(
                                 result.coordinates,
                                 {

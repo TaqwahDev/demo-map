@@ -7,7 +7,19 @@ const locationContext = React.createContext({
     setOrigin:()=>{},
     setDestination:()=>{},
     setCurrentLocation:()=>{},
-    clearState:()=>{}
+    clearState:()=>{},
+    isLoading:false,
+    errorMsg:null,
+    setIsLoading:()=>{},
+    setErrorMsg:()=>{},
+    travelMode:null,
+    setTravelMode:()=>{},
+    waypoints:[],
+    setWaypoints:()=>{},
+    steps:[],
+    setSteps:()=>{},
+    
+
 });
 
 export default locationContext;

@@ -1,97 +1,27 @@
-import * as Location from "expo-location";
-import * as TaskManager from "expo-task-manager";
-import { Image } from "native-base";
+import { Image, VStack, Text } from "native-base";
 import React from "react";
-import {
-    ActivityIndicator,
-    Dimensions,
-    StyleSheet,
-    Text,
-    View
-} from "react-native";
+import { ActivityIndicator, Dimensions, StyleSheet, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import env from "../../../env";
 import locationContext from "../../context/location-context";
-import useLocation from "../../hooks/use-location";
-
 const destImage = require("../../../assets/maoicons/home.png");
 const originImage = require("../../../assets/maoicons/track.png");
 
 export default function MapScreen() {
     const locationCtx = React.useContext(locationContext);
-    console.log("destination", locationCtx.destination);
-
-    const [getLocation, errorMsg] = useLocation();
-    const [currentLocation, setCurrentLocation] = React.useState(null);
-    const [heading, setHeading] = React.useState(null);
     const { width, height } = Dimensions.get("window");
 
     const ASPECT_RATIO = width / height;
     const LATITUDE_DELTA = 0.0922;
     const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-    const destinationLocation = {
-        latitude: locationCtx.destination.lat,
-        longitude: locationCtx.destination.lng,
-    };
+    const destinationLocation = locationCtx.destination || null;
+    const currentLocation = locationCtx.currentLocation || null;
 
     const mapRef = React.useRef(null);
 
-    const locationHandler = async () => {
-        const coords = await getLocation();
-        const locationCurr = {
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-        };
-
-        setCurrentLocation(locationCurr);
-    };
-
-    TaskManager.defineTask(
-        "YOUR_TASK_NAME",
-        ({ data: { locations }, error }) => {
-            if (error) {
-                // check `error.message` for more details.
-                return;
-            }
-            const coordinate = locations[0].coords;
-            const locationCurr = {
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-            };
-            setCurrentLocation(locationCurr);
-            
-        }
-    );
-
-    React.useEffect(() => {
-        locationHandler();
-        Location.startLocationUpdatesAsync("YOUR_TASK_NAME", {
-            accuracy: Location.Accuracy.Balanced,
-            timeInterval: 2000,
-            distanceInterval: 5,
-        });
-
-        return () => {
-            setCurrentLocation(null);
-            Location.stopLocationUpdatesAsync("YOUR_TASK_NAME");
-        };
-    }, []);
-
-    React.useEffect(() => {
-        if (
-            currentLocation &&
-            destinationLocation &&
-            currentLocation.latitude === destinationLocation.latitude &&
-            currentLocation.longitude === destinationLocation.longitude
-        ) {
-            alert("You have arrived at your destination");
-            Location.stopLocationUpdatesAsync("YOUR_TASK_NAME");
-        }
-    }, [currentLocation, destinationLocation]);
-
-    if (!currentLocation) {
+    if (locationCtx.isLoading || !currentLocation) {
         return (
             <View style={styles.container}>
                 <ActivityIndicator size="large" color="#9150F8" />
@@ -99,19 +29,75 @@ export default function MapScreen() {
         );
     }
 
-    if (errorMsg) {
+    const [position, setPosition] = React.useState({
+        distance: 0,
+        duration: 0,
+    });
+
+    if (locationCtx.errorMsg) {
         return (
             <View style={styles.container}>
-                <Text>{errorMsg}</Text>
+                <Text>{locationCtx.errorMsg}</Text>
             </View>
         );
     }
 
+    
+
     return (
-        <View style={styles.container}>
+        <VStack
+            position={"relative"}
+            flex="1"
+            justifyContent={"center"}
+            alignItems="center"
+        >
+            <VStack
+                p="4"
+                borderRadius={10}
+                top="4"
+                zIndex={100}
+                position={"absolute"}
+                w="90%"
+                minH="120"
+                bg="#fff"
+            >
+                <Text
+                    color={"#000"}
+                    fontSize={16}
+                    fonrWeight="700"
+                    fontFamaily="body"
+                    textAlign="center"
+                >
+                    Destination: {locationCtx.destination.description}
+                </Text>
+                <Text
+                    color={"#000"}
+                    fontSize={16}
+                    fonrWeight="700"
+                    fontFamaily="body"
+                    textAlign="center"
+                >
+                    Distance: {position.distance} km
+                </Text>
+                <Text
+                    color={"#000"}
+                    fontSize={16}
+                    fonrWeight="700"
+                    fontFamaily="body"
+                    textAlign="center"
+                >
+                    Duration: {position.duration.toFixed(0)} min
+                </Text>
+            </VStack>
+
             <MapView
                 ref={mapRef}
                 style={styles.map}
+                // onLayout={() => {
+                //     mapRef.current.animateCamera({
+                //         pitch: 90
+                //     })
+                // }}
                 initialRegion={{
                     latitude: currentLocation.latitude,
                     longitude: currentLocation.longitude,
@@ -121,6 +107,7 @@ export default function MapScreen() {
             >
                 {currentLocation && (
                     <Marker
+                        flat={true}
                         coordinate={{
                             latitude: currentLocation.latitude,
                             longitude: currentLocation.longitude,
@@ -130,13 +117,13 @@ export default function MapScreen() {
                         title="Current Location"
                         description="You are here"
                         identifier="origin"
-                      
                     >
                         <Image w="35" h="60" alt="car" source={originImage} />
                     </Marker>
                 )}
                 {destinationLocation ? (
                     <Marker
+                        flat={true}
                         coordinate={{
                             latitude: destinationLocation.latitude,
                             longitude: destinationLocation.longitude,
@@ -149,9 +136,21 @@ export default function MapScreen() {
                             style={{ width: 35, height: 60 }}
                             alt="car"
                             source={destImage}
+                            m="0"
                         />
                     </Marker>
                 ) : null}
+                {/* {locationCtx.waypoints.map((waypoint, index) => {
+                    return (
+                        <Marker
+                            key={index.toString()}
+                            coordinate={{
+                                latitude: waypoint.latitude,
+                                longitude: waypoint.longitude,
+                            }}
+                        />
+                    );
+                })} */}
 
                 {currentLocation && destinationLocation && (
                     <MapViewDirections
@@ -164,7 +163,15 @@ export default function MapScreen() {
                         resetOnChange={false}
                         strokeColor="#3BAF92"
                         animate="jack-in"
+                        mode="DRIVING"
+                        region="bd"
                         onReady={(result) => {
+                            setPosition({
+                                distance: result.distance,
+                                duration: result.duration,
+                            });
+                            console.log(`Distance: ${result.distance} km`);
+                            console.log(`Duration: ${result.duration} min.`);
                             mapRef.current.fitToCoordinates(
                                 result.coordinates,
                                 {
@@ -181,7 +188,7 @@ export default function MapScreen() {
                     />
                 )}
             </MapView>
-        </View>
+        </VStack>
     );
 }
 

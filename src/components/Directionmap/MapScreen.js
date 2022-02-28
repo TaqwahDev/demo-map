@@ -34,15 +34,7 @@ export default function MapScreen() {
         duration: 0,
     });
 
-    if (locationCtx.errorMsg) {
-        return (
-            <View style={styles.container}>
-                <Text color={'#0000'}>{locationCtx.errorMsg}</Text>
-            </View>
-        );
-    }
 
-    
 
     return (
         <VStack
@@ -86,7 +78,7 @@ export default function MapScreen() {
                     fontFamaily="body"
                     textAlign="center"
                 >
-                    Duration: {position.duration.toFixed(0)} min
+                    Duration: {position.duration.toFixed(2)} min
                 </Text>
             </VStack>
 

@@ -40,8 +40,8 @@ const locationReducer = (state, action) => {
             isLoading: false,
             errorMsg: null,
             travelMode: null,
-            waypoints: null,
-            steps: null,
+            waypoints: [],
+            steps: [],
         };
     }
     if (action.type === "SET_LOADING") {
@@ -73,6 +73,13 @@ const locationReducer = (state, action) => {
         return {
             ...state,
             steps: action.payload,
+        };
+    }
+
+    if (action.type === "SET_CURRENT_WAYPOINTS") {
+        return {
+            ...state,
+            currentWayPoints: action.payload,
         };
     }
 
@@ -129,6 +136,13 @@ export default function LocationWrapper({ children }) {
         setSteps: (steps) => {
             locationDispatch({ type: "SET_STEPS", payload: steps });
         },
+        currentWayPoints: locationState.currentWayPoints,
+        setCurrentWayPoints: (currentWayPoints) => {
+            locationDispatch({
+                type: "SET_CURRENT_WAYPOINTS",
+                payload: currentWayPoints,
+            });
+        }
     };
 
     return (

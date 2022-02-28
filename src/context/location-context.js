@@ -18,7 +18,8 @@ const locationContext = React.createContext({
     setWaypoints:()=>{},
     steps:[],
     setSteps:()=>{},
-    
+    currentWayPoints:null,
+    setCurrentWayPoints:()=>{},
 
 });
 

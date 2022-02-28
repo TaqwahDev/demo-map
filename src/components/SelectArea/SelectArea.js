@@ -1,5 +1,4 @@
 import { useNavigation } from "@react-navigation/native";
-import * as Location from "expo-location";
 import {
     Button,
     KeyboardAvoidingView,
@@ -13,17 +12,15 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import env from "../../../env";
 import locationContext from "../../context/location-context";
 import useLocation from "../../lib";
-import * as TaskManager from "expo-task-manager";
 
 export default function SelectArea() {
     let clear = true;
-    const LOCATION_TRACKING = "location-tracking";
     const navigation = useNavigation();
     const locationCtx = React.useContext(locationContext);
     const [
         getUserLocation,
         getWaypoints,
-        watchPosition,
+        startGeofencing,
         handleSearchSelector,
         config,
         startLocationTracking,
@@ -57,20 +54,32 @@ export default function SelectArea() {
         }
     }, [locationCtx.errorMsg]);
 
-    // React.useEffect(() => {
-    //     console.log("currentWayPoints", locationCtx.currentWayPoints);
-    //     getWaypoints();
-    // }, [locationCtx.origin, locationCtx.destination]);
+    React.useEffect(() => {
+        try {
+            getWaypoints();
+        } catch (error) {
+            console.log("error", error);
+        }
+        // console.log("currentWayPoints", locationCtx.currentWayPoints);
+        if (clear) {
+            return () => (clear = false);
+        }
+    }, [locationCtx.origin, locationCtx.destination]);
 
-    // React.useEffect(() => {
-    //     if (
-    //         locationCtx.destination &&
-    //         locationCtx.waypoints &&
-    //         locationCtx.waypoints.length > 0
-    //     ) {
-    //         watchPosition();
-    //     }
-    // }, [locationCtx.waypoints, locationCtx.destination]);
+    React.useEffect(() => {
+        if (
+            locationCtx.destination &&
+            locationCtx.waypoints &&
+            locationCtx.waypoints.length > 0
+        ) {
+            startGeofencing();
+        } else {
+            stopGeoFencing();
+        }
+        if (clear) {
+            return () => (clear = false);
+        }
+    }, [locationCtx.waypoints, locationCtx.destination]);
 
     if (locationCtx.isLoading) {
         return (

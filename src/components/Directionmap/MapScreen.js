@@ -1,4 +1,4 @@
-import { Image, VStack, Text } from "native-base";
+import { Image, Text, VStack } from "native-base";
 import React from "react";
 import { ActivityIndicator, Dimensions, StyleSheet, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
@@ -159,6 +159,7 @@ export default function MapScreen() {
                         region="bd"
                         onReady={(result) => {
                             const { distance, duration } = result;
+                            console.log(result);
                             const res={distance,duration};
                             setPosition(res);
 

@@ -43,18 +43,21 @@ export default function useLocation() {
 
     const startLocationTracking = async () => {
         locationCtx.setIsLoading(true);
-        await Location.startLocationUpdatesAsync(LOCATION_TRACKING, {
-            accuracy: Location.Accuracy.Highest,
-            timeInterval: 2000,
-            distanceInterval: 0,
-        });
-        const hasStarted = await Location.hasStartedLocationUpdatesAsync(
-            LOCATION_TRACKING
-        );
-        console.log("tracking started?", hasStarted);
-
-        if (hasStarted) {
-            locationCtx.setIsLoading(false);
+        try {
+            await Location.startLocationUpdatesAsync(LOCATION_TRACKING, {
+                accuracy: Location.Accuracy.Highest,
+                timeInterval: 2000,
+                distanceInterval: 0,
+            });
+            const hasStarted = await Location.hasStartedLocationUpdatesAsync(
+                LOCATION_TRACKING
+            );
+            console.log("tracking started?", hasStarted);
+            if (hasStarted) {
+                locationCtx.setIsLoading(false);
+            }
+        } catch (error) {
+            console.log("Failed to start task", error);
         }
     };
 
@@ -87,7 +90,7 @@ export default function useLocation() {
         }
     };
 
-    const watchPosition = async () => {
+    const startGeofencing = async () => {
         // console.log(locationCtx.waypoints)
         try {
             await Location.startGeofencingAsync(
@@ -132,8 +135,9 @@ export default function useLocation() {
     };
 
     const stopGeoFencing = async () => {
-        const hasStarted =
-            await Location.hasStartedLocationUpdatesAsync(WATCH_WAYPOINTS);
+        const hasStarted = await Location.hasStartedLocationUpdatesAsync(
+            WATCH_WAYPOINTS
+        );
         if (hasStarted) {
             Location.stopGeofencingAsync(WATCH_WAYPOINTS);
             console.log("watchPosition stopped");
@@ -154,9 +158,6 @@ export default function useLocation() {
                 longitude: long,
             };
             locationCtx.setCurrentLocation(locationCurr);
-            console.log(
-                `${new Date(Date.now()).toLocaleString()}: ${lat},${long}`
-            );
         }
     });
 
@@ -170,6 +171,7 @@ export default function useLocation() {
             if (eventType === GeofencingEventType.Enter) {
                 try {
                     locationCtx.setCurrentWayPoints(region);
+                    console.log("You've entered region:", region);
                 } catch (ee) {
                     console.log("error", ee);
                 }
@@ -183,7 +185,7 @@ export default function useLocation() {
     return [
         getUserLocation,
         getWaypoints,
-        watchPosition,
+        startGeofencing,
         handleSearchSelector,
         config,
         startLocationTracking,

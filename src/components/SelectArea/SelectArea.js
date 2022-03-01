@@ -1,10 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
+import * as TaskManager from "expo-task-manager";
 import {
     Button,
     KeyboardAvoidingView,
     Pressable,
     Text,
-    VStack,
+    VStack
 } from "native-base";
 import React from "react";
 import { ActivityIndicator, Keyboard } from "react-native";
@@ -12,6 +13,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import env from "../../../env";
 import locationContext from "../../context/location-context";
 import useLocation from "../../lib";
+
 
 export default function SelectArea() {
     let clear = true;
@@ -44,6 +46,7 @@ export default function SelectArea() {
         return () => {
             stopLocationTracking();
             stopGeoFencing();
+            TaskManager.unregisterAllTasksAsync();
         };
     }, []);
 
@@ -51,6 +54,9 @@ export default function SelectArea() {
         if (locationCtx.errorMsg) {
             alert(locationCtx.errorMsg);
             console.log("error", locationCtx.errorMsg);
+        }
+        if (clear) {
+            return () => (clear = false);
         }
     }, [locationCtx.errorMsg]);
 
@@ -88,6 +94,7 @@ export default function SelectArea() {
             </VStack>
         );
     }
+ 
 
     return (
         <KeyboardAvoidingView flex="1">

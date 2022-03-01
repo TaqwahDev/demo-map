@@ -34,7 +34,20 @@ export default function MapScreen() {
         duration: 0,
     });
 
+    const getDirections = () => {
+        const currentOrigin = locationCtx.currentWayPoints;
+        const data = locationCtx.steps;
+        if (currentOrigin && data) {
+            const dir = data.find(
+                (item) =>
+                    item.latitude === currentOrigin.latitude &&
+                    item.longitude === currentOrigin.longitude
+            );
+            return dir.message;
+        } else return null;
+    };
 
+    const message = getDirections();
 
     return (
         <VStack
@@ -80,6 +93,17 @@ export default function MapScreen() {
                 >
                     Duration: {position.duration.toFixed(2)} min
                 </Text>
+                {message && (
+                    <Text
+                        color={"#000"}
+                        fontSize={16}
+                        fonrWeight="700"
+                        fontFamaily="body"
+                        textAlign="center"
+                    >
+                      Direction:  {message}
+                    </Text>
+                )}
             </VStack>
 
             <MapView
@@ -159,8 +183,8 @@ export default function MapScreen() {
                         region="bd"
                         onReady={(result) => {
                             const { distance, duration } = result;
-                            console.log(result);
-                            const res={distance,duration};
+
+                            const res = { distance, duration };
                             setPosition(res);
 
                             // console.log(`Distance: ${result.distance} km`);

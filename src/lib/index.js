@@ -83,8 +83,18 @@ export default function useLocation() {
                     radius: 50,
                 };
             });
+
             locationCtx.setWaypoints(waypoints);
-            locationCtx.setSteps(steps);
+           
+            const regions= steps.map(st=>{
+                return {
+                    latitude: st.start_location.lat,
+                    longitude: st.start_location.lng,
+                    message: st.html_instructions,
+                }
+            }) 
+            // console.log("regions",regions)
+            locationCtx.setSteps(regions);
         } catch (error) {
             locationCtx.setErrorMsg("Error 2", error.message);
         }
@@ -97,6 +107,12 @@ export default function useLocation() {
                 WATCH_WAYPOINTS,
                 locationCtx.waypoints
             );
+            const hasStarted = await Location.hasStartedGeofencingAsync(
+                WATCH_WAYPOINTS
+            );
+            if (hasStarted) {
+                console.log("geofencing started");
+            }
         } catch (error) {
             console.log("error", error);
             locationCtx.setErrorMsg(error.message);

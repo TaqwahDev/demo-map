@@ -23,9 +23,10 @@ export default function useLocation() {
     };
 
     const getUserLocation = async () => {
+        // alert("getUserLocation");
         locationCtx.setIsLoading(true);
         try {
-            const location = await Location.getCurrentPositionAsync({});
+            const location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.Highest, maximumAge: 10000});
             const locationCurr = {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
@@ -33,6 +34,7 @@ export default function useLocation() {
 
             locationCtx.setCurrentLocation(locationCurr);
             locationCtx.setOrigin(locationCurr);
+            alert(JSON.stringify(locationCurr));
             locationCtx.setIsLoading(false);
         } catch (error) {
             console.log("error", error);
@@ -199,6 +201,7 @@ export default function useLocation() {
     );
 
     return [
+        askPerMission,
         getUserLocation,
         getWaypoints,
         startGeofencing,

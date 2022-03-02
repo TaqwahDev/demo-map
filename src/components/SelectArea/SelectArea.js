@@ -5,7 +5,7 @@ import {
     KeyboardAvoidingView,
     Pressable,
     Text,
-    VStack
+    VStack,
 } from "native-base";
 import React from "react";
 import { ActivityIndicator, Keyboard } from "react-native";
@@ -14,12 +14,12 @@ import env from "../../../env";
 import locationContext from "../../context/location-context";
 import useLocation from "../../lib";
 
-
 export default function SelectArea() {
     let clear = true;
     const navigation = useNavigation();
     const locationCtx = React.useContext(locationContext);
     const [
+        askPerMission,
         getUserLocation,
         getWaypoints,
         startGeofencing,
@@ -31,7 +31,7 @@ export default function SelectArea() {
     ] = useLocation();
 
     const handleNavigation = () => {
-        if (!locationCtx.destination) {
+        if (!locationCtx.destination || !locationCtx.origin) {
             alert("Please select origin");
             return;
         }
@@ -39,13 +39,22 @@ export default function SelectArea() {
     };
 
     React.useEffect(() => {
-        config();
-        startLocationTracking();
-        getUserLocation();
+        (async () => {
+            const hasPermission = await askPerMission();
+            if (hasPermission) {
+                await config();
+                await getUserLocation();
+                await startLocationTracking();
+            }
+        })();
+
+        // config();
+        // startLocationTracking();
+        // getUserLocation();
 
         return () => {
-            stopLocationTracking();
-            stopGeoFencing();
+            // stopLocationTracking();
+            // stopGeoFencing();
             TaskManager.unregisterAllTasksAsync();
         };
     }, []);
@@ -94,7 +103,6 @@ export default function SelectArea() {
             </VStack>
         );
     }
- 
 
     return (
         <KeyboardAvoidingView flex="1">

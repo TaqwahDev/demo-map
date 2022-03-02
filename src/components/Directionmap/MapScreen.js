@@ -7,6 +7,7 @@ import env from "../../../env";
 import locationContext from "../../context/location-context";
 const destImage = require("../../../assets/maoicons/home.png");
 const originImage = require("../../../assets/maoicons/track.png");
+// import config from "expo-config";
 
 export default function MapScreen() {
     const locationCtx = React.useContext(locationContext);
@@ -21,13 +22,22 @@ export default function MapScreen() {
 
     const mapRef = React.useRef(null);
 
-    if (locationCtx.isLoading || !currentLocation) {
+    if (locationCtx.isLoading) {
         return (
             <View style={styles.container}>
                 <ActivityIndicator size="large" color="#9150F8" />
             </View>
         );
     }
+
+    // if(!currentLocation){
+    //     alert("Please enable location services");
+    //     return (
+    //         <View style={styles.container}>
+    //             <ActivityIndicator size="large" color="#9150F8" />
+    //         </View>
+    //     );
+    // }
 
     const [position, setPosition] = React.useState({
         distance: 0,
@@ -44,7 +54,8 @@ export default function MapScreen() {
                     item.longitude === currentOrigin.longitude
             );
             return dir.message;
-        } else return null;
+        }
+        return null;
     };
 
     const message = getDirections();
@@ -101,7 +112,7 @@ export default function MapScreen() {
                         fontFamaily="body"
                         textAlign="center"
                     >
-                      Direction:  {message}
+                        Direction: {message}
                     </Text>
                 )}
             </VStack>

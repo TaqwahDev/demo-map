@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SelectArea from "./components/SelectArea/SelectArea";
 import MapScreen from "./components/Directionmap/MapScreen";
+import TestMap from "./components/Directionmap/TestMap";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,7 +18,7 @@ export default function Main() {
                 }}
             >
                 <Stack.Screen name="SelectArea" component={SelectArea} />
-                <Stack.Screen name="Map" component={MapScreen} />
+                <Stack.Screen name="Map" component={TestMap} />
             </Stack.Navigator>
         </NavigationContainer>
     );

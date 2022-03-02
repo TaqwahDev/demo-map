@@ -15,12 +15,24 @@
         },
         "assetBundlePatterns": ["**/*"],
         "ios": {
-            "supportsTablet": true
+            "supportsTablet": true,
+            "bundleIdentifier": "com.naimur001.demoapp",
+            "buildNumber": "1",
+            "config": {
+                "googleMapsApiKey": "AIzaSyBG7iJabCnW3Hn2GAAk7lgcTBox7igfJq4"
+            }
         },
         "android": {
             "adaptiveIcon": {
                 "foregroundImage": "./assets/adaptive-icon.png",
                 "backgroundColor": "#F9F9F9"
+            },
+            "package": "com.naimur001.demoapp",
+            "versionCode": 1,
+            "config": {
+                "googleMaps": {
+                    "apiKey": "AIzaSyBG7iJabCnW3Hn2GAAk7lgcTBox7igfJq4"
+                }
             }
         },
         "web": {

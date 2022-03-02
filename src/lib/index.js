@@ -23,9 +23,10 @@ export default function useLocation() {
     };
 
     const getUserLocation = async () => {
+        // alert("getUserLocation");
         locationCtx.setIsLoading(true);
         try {
-            const location = await Location.getCurrentPositionAsync({});
+            const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest, maximumAge: 10000 });
             const locationCurr = {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
@@ -33,11 +34,12 @@ export default function useLocation() {
 
             locationCtx.setCurrentLocation(locationCurr);
             locationCtx.setOrigin(locationCurr);
+            alert(JSON.stringify(locationCurr));
             locationCtx.setIsLoading(false);
         } catch (error) {
-            console.log("error", error);
+            console.log("error 300", error);
             locationCtx.setIsLoading(false);
-            locationCtx.setErrorMsg("eror1", error.message);
+            locationCtx.setErrorMsg("eror1 Enable location services");
         }
     };
 
@@ -85,18 +87,19 @@ export default function useLocation() {
             });
 
             locationCtx.setWaypoints(waypoints);
-           
-            const regions= steps.map(st=>{
+
+            const regions = steps.map(st => {
                 return {
                     latitude: st.start_location.lat,
                     longitude: st.start_location.lng,
                     message: st.html_instructions,
                 }
-            }) 
+            })
             // console.log("regions",regions)
             locationCtx.setSteps(regions);
         } catch (error) {
-            locationCtx.setErrorMsg("Error 2", error.message);
+            locationCtx.setErrorMsg(error.message);
+            console.log("error 200", error);
         }
     };
 
@@ -114,7 +117,7 @@ export default function useLocation() {
                 console.log("geofencing started");
             }
         } catch (error) {
-            console.log("error", error);
+            console.log("error 100", error);
             locationCtx.setErrorMsg(error.message);
         }
     };
@@ -139,6 +142,7 @@ export default function useLocation() {
         }
     };
 
+    
     const stopLocationTracking = async () => {
         const hasStarted = await Location.hasStartedLocationUpdatesAsync(
             LOCATION_TRACKING
@@ -199,6 +203,7 @@ export default function useLocation() {
     );
 
     return [
+        askPerMission,
         getUserLocation,
         getWaypoints,
         startGeofencing,

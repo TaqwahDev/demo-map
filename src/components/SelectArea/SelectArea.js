@@ -5,7 +5,7 @@ import {
     KeyboardAvoidingView,
     Pressable,
     Text,
-    VStack
+    VStack,
 } from "native-base";
 import React from "react";
 import { ActivityIndicator, Keyboard } from "react-native";
@@ -14,12 +14,12 @@ import env from "../../../env";
 import locationContext from "../../context/location-context";
 import useLocation from "../../lib";
 
-
 export default function SelectArea() {
     let clear = true;
     const navigation = useNavigation();
     const locationCtx = React.useContext(locationContext);
     const [
+        askPerMission,
         getUserLocation,
         getWaypoints,
         startGeofencing,
@@ -31,7 +31,12 @@ export default function SelectArea() {
     ] = useLocation();
 
     const handleNavigation = () => {
-        if (!locationCtx.destination) {
+        if (!locationCtx.destination ) {
+            alert("Please select destination");
+            return;
+        }
+        
+        if ( !locationCtx.origin) {
             alert("Please select origin");
             return;
         }
@@ -39,21 +44,34 @@ export default function SelectArea() {
     };
 
     React.useEffect(() => {
-        config();
-        startLocationTracking();
-        getUserLocation();
+        (async () => {
+            const hasPermission = await askPerMission();
+            if (hasPermission) {
+               try {
+                await config();
+                await getUserLocation();
+                await startLocationTracking();
+               } catch (error) {
+                   console.log("error", error);
+               }
+            }
+        })();
+
+        // config();
+        // startLocationTracking();
+        // getUserLocation();
 
         return () => {
             stopLocationTracking();
             stopGeoFencing();
-            TaskManager.unregisterAllTasksAsync();
+            // TaskManager.unregisterAllTasksAsync();
         };
     }, []);
 
     React.useEffect(() => {
         if (locationCtx.errorMsg) {
             alert(locationCtx.errorMsg);
-            console.log("error", locationCtx.errorMsg);
+            console.log("error 800", locationCtx.errorMsg);
         }
         if (clear) {
             return () => (clear = false);
@@ -64,7 +82,7 @@ export default function SelectArea() {
         try {
             getWaypoints();
         } catch (error) {
-            console.log("error", error);
+            console.log("error here", error);
         }
         // console.log("currentWayPoints", locationCtx.currentWayPoints);
         if (clear) {
@@ -94,7 +112,6 @@ export default function SelectArea() {
             </VStack>
         );
     }
- 
 
     return (
         <KeyboardAvoidingView flex="1">

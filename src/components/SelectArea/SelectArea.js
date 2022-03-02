@@ -31,7 +31,12 @@ export default function SelectArea() {
     ] = useLocation();
 
     const handleNavigation = () => {
-        if (!locationCtx.destination || !locationCtx.origin) {
+        if (!locationCtx.destination ) {
+            alert("Please select destination");
+            return;
+        }
+        
+        if ( !locationCtx.origin) {
             alert("Please select origin");
             return;
         }
@@ -42,9 +47,19 @@ export default function SelectArea() {
         (async () => {
             const hasPermission = await askPerMission();
             if (hasPermission) {
+<<<<<<< HEAD
                 await config();
                 await getUserLocation();
                 await startLocationTracking();
+=======
+               try {
+                await config();
+                await getUserLocation();
+                await startLocationTracking();
+               } catch (error) {
+                   console.log("error", error);
+               }
+>>>>>>> 9b1715ccf2a20dbffa495efa96f234926758b1ac
             }
         })();
 
@@ -53,16 +68,22 @@ export default function SelectArea() {
         // getUserLocation();
 
         return () => {
+<<<<<<< HEAD
             // stopLocationTracking();
             // stopGeoFencing();
             TaskManager.unregisterAllTasksAsync();
+=======
+            stopLocationTracking();
+            stopGeoFencing();
+            // TaskManager.unregisterAllTasksAsync();
+>>>>>>> 9b1715ccf2a20dbffa495efa96f234926758b1ac
         };
     }, []);
 
     React.useEffect(() => {
         if (locationCtx.errorMsg) {
             alert(locationCtx.errorMsg);
-            console.log("error", locationCtx.errorMsg);
+            console.log("error 800", locationCtx.errorMsg);
         }
         if (clear) {
             return () => (clear = false);
@@ -73,7 +94,7 @@ export default function SelectArea() {
         try {
             getWaypoints();
         } catch (error) {
-            console.log("error", error);
+            console.log("error here", error);
         }
         // console.log("currentWayPoints", locationCtx.currentWayPoints);
         if (clear) {

@@ -16,7 +16,7 @@ export default function TestMap() {
     const LATITUDE_DELTA = 0.0922;
     const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-    // const destinationLocation = locationCtx.destination || null;
+    const destinationLocation = locationCtx.destination;
     const currentLocation = locationCtx.currentLocation;
 
     const mapRef = React.useRef(null);
@@ -55,6 +55,29 @@ export default function TestMap() {
                         <Image w="35" h="60" alt="car" source={originImage} />
                     </Marker>
                 )}
+
+
+                {destinationLocation && (
+                    <Marker
+                        flat={true}
+                        coordinate={{
+                            latitude: destinationLocation.latitude,
+                            longitude: destinationLocation.longitude,
+                        }}
+                        title="Destination Location"
+                        description="You going there"
+                        identifier="destination"
+                    >
+                        <Image
+                            style={{ width: 35, height: 60 }}
+                            alt="car"
+                            source={destImage}
+                            m="0"
+                        />
+                    </Marker>
+                )}
+
+
             </MapView>
         </VStack>
     );

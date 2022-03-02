@@ -148,7 +148,7 @@ export default function MapScreen() {
                         <Image w="35" h="60" alt="car" source={originImage} />
                     </Marker>
                 )}
-                {destinationLocation ? (
+                {destinationLocation && (
                     <Marker
                         flat={true}
                         coordinate={{
@@ -166,7 +166,7 @@ export default function MapScreen() {
                             m="0"
                         />
                     </Marker>
-                ) : null}
+                )}
                 {/* {locationCtx.waypoints.map((waypoint, index) => {
                     return (
                         <Marker
